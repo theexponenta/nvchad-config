@@ -5,12 +5,53 @@ return {
     opts = require "configs.conform",
   },
 
-  -- These are some examples, uncomment them if you want to see them work!
   {
     "neovim/nvim-lspconfig",
     config = function()
       require "configs.lspconfig"
     end,
+  },
+
+  {
+      "mason-org/mason.nvim",
+      opts = function ()
+        require("mason").setup {
+          registries = {
+            "github:mason-org/mason-registry",
+          },
+        }
+
+        local mr = require "mason-registry"
+        mr.refresh(function()
+          local package = require "mason-core.package"
+          local notify = require "mason-core.notify"
+
+          for _, tool in ipairs {
+            "codelldb",
+            "pyrefly",
+          } do
+            local package_name, _ = package.Parse(tool)
+            local p_ok, p = pcall(mr.get_package, package_name)
+
+            if not p_ok or not p then
+              notify(("%q is not a valid package."):format(tool), vim.log.levels.ERROR)
+              goto continue
+            end
+
+            if not p:is_installed() then
+              p:install(nil, function(ok, err)
+                if ok or not err then return end
+                notify(
+                  ("Error installing %s.\n%s"):format(tool, tostring(err)),
+                  vim.log.levels.ERROR,
+                  { title = "Mason (install)" }
+                )
+              end)
+            end
+              ::continue::
+          end
+        end)
+      end
   },
 
   {
@@ -33,8 +74,8 @@ return {
         tools = {
           float_win_config = {
             border = 'rounded'
-          }           
-        } 
+          }
+        }
       }
     end
   },
@@ -81,7 +122,7 @@ return {
   },
 
   {
-    'rcarriga/nvim-dap-ui', 
+    'rcarriga/nvim-dap-ui',
     dependencies = {"mfussenegger/nvim-dap", "nvim-neotest/nvim-nio"},
     config = function()
 			require("dapui").setup()
