@@ -29,6 +29,7 @@ return {
           for _, tool in ipairs {
             "codelldb",
             "pyrefly",
+            "tsserver",
           } do
             local package_name, _ = package.Parse(tool)
             local p_ok, p = pcall(mr.get_package, package_name)
