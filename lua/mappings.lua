@@ -21,12 +21,14 @@ map({ "n", "i", "v" }, "<C-s>", "<cmd> w <cr>")
 
 map("n", "K", function() vim.lsp.buf.hover { border = "rounded" } end, { desc = "LSP Hover" } );
 
-function stopinsert()
+local function stopinsert()
   vim.cmd('stopinsert')
 end
 
 map('t', "<Esc>", stopinsert, { noremap = true, silent = true })
 map('t', "jj", stopinsert, { noremap = true, silent = true })
+
+vim.keymap.set("n", "<Leader>a", function() vim.lsp.buf.code_action() end, { desc = "LSP Code Action" })
 
 -- Nvim DAP
 map("n", "<Leader>dl", "<cmd>lua require'dap'.step_into()<CR>", { desc = "Debugger step into" })
